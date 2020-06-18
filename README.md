@@ -8,7 +8,7 @@ Each survey will have a unique quiz id, (but we could re-use questions) and each
 
 The system consists of a front end (React) that allows users to submit the answers to a series of different types of questions and a back end which stores and processes the response to these questions.
 
-theCircle is in active development and should very much be seen as a POC that will be iterated upon until it is of production quality, where it will be incorporated as a module into our SASS offering.
+theCircle is in active development and should very much be seen as a POC that will be iterated upon until it is of production quality, where it will be incorporated as a module into our SAAS offering.
 
 ## Architecture
 
@@ -237,7 +237,7 @@ The architecture uses a number of lambda functions that are written in golang.
 
 ### The listenCapture function
 
-The responsibility of this function is to sit behind the AWS API gateway and store incomming feedback into an s3 bucket as a json document.
+The responsibility of this function is to sit behind the AWS API gateway and store incoming feedback into an s3 bucket as a json document.
 
 ### The listenQuestionTrigger function
 
@@ -260,7 +260,7 @@ Each folder has its own README.md that goes into greater depth about each compon
 
 ### Lambda Functions
 
-Execute the build.sh in the root directory.  Zip files containing the lammbda functions will be built in the dist directory.  Each project has its own build.sh file
+Execute the build.sh in the root directory.  Zip files containing the lambda functions will be built in the dist directory.  Each project has its own build.sh file
 
 ### Client
 
