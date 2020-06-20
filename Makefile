@@ -9,6 +9,9 @@ endef
 build: ## build all of the source files and copy them to the ./dist directory
 build: preBuild listenCaptureLambda listenDataStoreLambda listenQuestionTrigger
 
+run: ## runs app on localhost:3000/
+	cd ./client && npm run start
+
 preBuild: 
 	rm -rf dist
 	mkdir dist
@@ -31,9 +34,6 @@ listenQuestionTrigger: TARGET_NAME=listenQuestionTrigger
 listenQuestionTrigger: FILE_NAME=listenQuestionTrigger
 listenQuestionTrigger:
 	$(commonBuild)
-
-run: ## runs app on localhost:3000/
-	cd ./client && npm run start
 
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
