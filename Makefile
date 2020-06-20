@@ -1,28 +1,39 @@
-## build all of the source files and copy them to the dist directory
+BUILD=main.go
+
+define commonBuild
+echo "building $(TARGET_NAME)"
+cd ./server/lambda/$(FILE_NAME)/ && env GOOS=linux go build $(BUILD) && zip $(FILE_NAME).zip main && rm main
+mv ./server/lambda/$(FILE_NAME)/$(FILE_NAME).zip ./dist/
+endef
+
+build: ## build all of the source files and copy them to the ./dist directory
 build: preBuild listenCaptureLambda listenDataStoreLambda listenQuestionTrigger
 
 preBuild: 
 	rm -rf dist
 	mkdir dist
 
+# sets variables for listenCaptureLambda
+listenCaptureLambda: TARGET_NAME=listenCaptureLambda
+listenCaptureLambda: FILE_NAME=listenCapture
 listenCaptureLambda:
-	# Build the listenCaptureLambda - This is the lambda that captures responses to questions
-	echo "building listenCaptureLambda"
-	cd ./server/lambda/listenCapture/ && env GOOS=linux go build main.go && zip listenCapture.zip main && rm main
-	mv ./server/lambda/listenCapture/listenCapture.zip ./dist/
+	$(commonBuild)
 
+# sets variables for listenDataStore
+listenDataStoreLambda: BUILD=-o main
+listenDataStoreLambda: TARGET_NAME=listenDataStoreLambda
+listenDataStoreLambda: FILE_NAME=listenDataStore
 listenDataStoreLambda:
-	# Build the listenDataStoreLambda - This is the Lambda function that listens to the FIFO queue and stores the data into s3
-	echo "building listenDataStoreLambda"
-	cd ./server/lambda/listenDataStore/ && env GOOS=linux go build -o main && zip listenDataStore.zip main && rm main
-	mv ./server/lambda/listenDataStore/listenDataStore.zip ./dist/
+	$(commonBuild)
 
+# sets variables for listenQuestionTrigger
+listenQuestionTrigger: TARGET_NAME=listenQuestionTrigger
+listenQuestionTrigger: FILE_NAME=listenQuestionTrigger
 listenQuestionTrigger:
-	# Build the listenQuestionTrigger 
-	echo "building listenQuestionTrigger"
-	cd ./server/lambda/listenQuestionTrigger/ && env GOOS=linux go build main.go && zip listenQuestionTrigger.zip main && rm main
-	mv ./server/lambda/listenQuestionTrigger/listenQuestionTrigger.zip ./dist/
+	$(commonBuild)
 
-run: 
+run: ## runs app on localhost:3000/
 	cd ./client && npm run start
-	
+
+help:
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
