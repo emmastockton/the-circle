@@ -281,7 +281,7 @@ In order to set-up the application on AWS.
 
 * Create an s3 bucket which you will use to store the code and cloudFormation templates.
 
-* In the s3 bucket create a src directory.  Execute the build.sh script (in the root dir, it will create a dist directory) to build the lambda functions and upload them to the src directory in the s3 bucket.
+* In the s3 bucket create a src directory.  Execute `make build` to build the lambda functions and upload them to the src directory in the s3 bucket.
 
 * In the s3 bucket create a folder called cfn.  Upload the CFN files from the /cfn directory.
 
@@ -327,6 +327,8 @@ window.awsAPI = {
 ```
 npm run start
 ```
+or `make run` from the root directory.
+
 
 * The app should load in your browser.
 
