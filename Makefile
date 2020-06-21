@@ -11,8 +11,11 @@ build: listenCaptureLambda listenDataStoreLambda listenQuestionTrigger
 clean:
 	rm -rf ./bin
 
+install: ## install the client dependencies
+	npm --prefix ./client install
+
 run: ## runs app on localhost:3000/
-	cd ./client && npm run start
+	npm --prefix ./client start
 
 # sets variables for listenCaptureLambda
 listenCaptureLambda: TARGET_NAME=listenCaptureLambda
