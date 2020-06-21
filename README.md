@@ -2,9 +2,9 @@
 
 theCircle is a POC project where we are experimenting with tools and techniques to gather and then analyse feedback from our teams.
 
-Every week we will launch a new internal survey to find out how our staff are doing.  
+Every week we will launch a new internal survey to find out how our staff are doing.
 
-Each survey will have a unique quiz id, (but we could re-use questions) and each question within a quiz has a unique questionId.  Once users have started submitting results, administrators will be able to run reports that allow them to analyse the mood of our staff.
+Each survey will have a unique quiz id, (but we could re-use questions) and each question within a quiz has a unique questionId. Once users have started submitting results, administrators will be able to run reports that allow them to analyse the mood of our staff.
 
 The system consists of a front end (React) that allows users to submit the answers to a series of different types of questions and a back end which stores and processes the response to these questions.
 
@@ -12,9 +12,9 @@ theCircle is in active development and should very much be seen as a POC that wi
 
 ## Architecture
 
-theCircle is a serverless application.  It is an experiment in building systems that avoid relational databases.
+theCircle is a serverless application. It is an experiment in building systems that avoid relational databases.
 
-Each quiz (feedback) is represented as a JSON document.  We will build a tool that allows us to create new quizes from a bank of questions.  In the POC the first quiz is currently hard-coded into the application.
+Each quiz (feedback) is represented as a JSON document. We will build a tool that allows us to create new quizes from a bank of questions. In the POC the first quiz is currently hard-coded into the application.
 
 Each quiz has a unique id number (top level id field).
 
@@ -141,13 +141,13 @@ Here is an example of a quiz.
 }
 ```
 
-Rather than storing the results in tables, data is stored within json documents.  There are two types of document.  When feedback is submitted it is assigned a guid and stored in its entirity in a s3 bucket by the listenCaptureFunction.  We call these raw documents.  
+Rather than storing the results in tables, data is stored within json documents. There are two types of document. When feedback is submitted it is assigned a guid and stored in its entirity in a s3 bucket by the listenCaptureFunction. We call these raw documents.
 
-Once the raw document is stored in s3 a trigger implemented within listenQuestionTrigger fires which puts a processing job on a FIFO queue.  
+Once the raw document is stored in s3 a trigger implemented within listenQuestionTrigger fires which puts a processing job on a FIFO queue.
 
-The listenDataStore lambda takes jobs from the FIFO Queue and creates json documents that can be read by the reporting tools.  As we are not using a database the listenDataStore lambda may choose to store the same data in many formats to make reporting easier and more efficient.
+The listenDataStore lambda takes jobs from the FIFO Queue and creates json documents that can be read by the reporting tools. As we are not using a database the listenDataStore lambda may choose to store the same data in many formats to make reporting easier and more efficient.
 
-As the listenDataStore lambda processes a consolidated view of a quiz / question, it is vitally important that multiple processes are not allowed to process the same consolidated json document at the same time as this could lead to data loss.  This is why raw feedback is placed on a FIFO queue and processed in sequence.  Remember s3 is eventually consisent and has no locking functionality!
+As the listenDataStore lambda processes a consolidated view of a quiz / question, it is vitally important that multiple processes are not allowed to process the same consolidated json document at the same time as this could lead to data loss. This is why raw feedback is placed on a FIFO queue and processed in sequence. Remember s3 is eventually consisent and has no locking functionality!
 
 Here is an example of a raw json document:
 
@@ -245,14 +245,13 @@ This function is called as an s3 trigger when a new document is stored, the trig
 
 ### The listenDataStore function
 
-This function is triggered when a message is placed on the FIFO Queue.  It takes the new data from the new survey and outputs it in a number
+This function is triggered when a message is placed on the FIFO Queue. It takes the new data from the new survey and outputs it in a number
 of formats that make it easier to write useful reports.
 
 ## Directory Structure
 
-* cfn - The cloudFormation scripts needed to create the infrastructure on AWS
-* client - The frontEnd written in React
-* server / lambda - The lambda functions that implement the back-end (written in golang)
+- client - The frontEnd written in React
+- server / lambda - The lambda functions that implement the back-end (written in golang)
 
 Each folder has its own README.md that goes into greater depth about each component.
 
@@ -260,80 +259,54 @@ Each folder has its own README.md that goes into greater depth about each compon
 
 ### Lambda Functions
 
-Execute the build.sh in the root directory.  Zip files containing the lambda functions will be built in the dist directory.  Each project has its own build.sh file
+Build and deploy Lambda:
+
+```
+make deploy
+```
+
+**Note** This requires some S3 buckets to be created first and AWS to be configured on your machine. See AWS instructions below.
+
+By default, the serverless deployment will use the `dev` stage.
 
 ### Client
-
-Within the client directory.
 
 Follow the AWS installation instructions, specifically the part about updating settings.js.
 
 ```
-npm install
-npm run start
+make install
+make run
 ```
 
 ## AWS installation instructions
 
 In order to set-up the application on AWS.
 
-* Login to the console.
+- Login to the console.
 
-* Create an s3 bucket which you will use to store the code and cloudFormation templates.
+- Create 2 s3 buckets:-
 
-* In the s3 bucket create a src directory.  Execute `make build` to build the lambda functions and upload them to the src directory in the s3 bucket.
+  - `answers-tech-task-the-circle`
+  - `datastorage-dev`
 
-* In the s3 bucket create a folder called cfn.  Upload the CFN files from the /cfn directory.
+- Locally, ensure that you have an AWS config in `~/.aws/credentials` (See: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 
-* Click on the main.yaml file and copy its Object URL to your clipboard.
+- Deploy the stack using: `make deploy`
 
-* From the console load the cloudFormation console.  Select Create Stack - with new resources (standard).  This will load the Create Stack menu.
+- When deployed, make note of the endpoint URL outputted by serverless. Update **client/public/settings.js** with this url as follows:
 
-* Paste the location of the main.yaml file into the Amazon S3 URL field.  Click on next.
-
-* Give the stack a name (theCircle)
-
-* Enter the name of the bucket where the feedback results will be stored - Remember that this needs to be globally unique!
-
-* Enter the name of the bucket that you created in the second step.
-
-* Click next.
-
-* Scroll to the bottom of the page and click on the two tick boxes to sign your life away :-)  Then click on create stack.  Don't worry the stack does not spin up any expensive resources.  It will take about five minutes for the script to run.
-
-* Now we need to get the app working.  cd into the client directory.
-
-* type
-
-```
-npm install
-```
-
-* In the client/public directory there is a file called settings.js.  You will need to edit apiEndPoint parameter to point at the apiGateway endpoint that was configured when you ran the cloudFormation.  The file will look something like this.
-
-```
+```js
 window.awsAPI = {
-    apiEndpoint : "https://<abc>.execute-api.eu-west-1.amazonaws.com/Prod/resources"
-}
+  apiEndpoint: '<your-endpoint-url>',
+};
 ```
 
-* To find the apiEndpoint.  Go to the CloudFormation page and click on stacks.  Click on the toggle button that allows you to see nested stacks.
+- run the local app using `make install && make run`
 
-* There should be a stack called <stack name>-ListenAPI-<some characters> where the stack name is the name that you created the stack under.
+- The app should load in your browser.
 
-* Click on that stack then click on the outputs tag.  Cut and paste the RootUrl parameter into the settings.jsp file replacing whatever value is in the apiEndpoint key.  Make sure that you add /resources to the end of the endPoint!!
+- Run through the survey. If everything goes ok you should get a message thanking you for your input, and you should see a post request to the back end.
 
-* type
-```
-npm run start
-```
-or `make run` from the root directory.
-
-
-* The app should load in your browser.
-
-* Run through the survey.  If everything goes ok you should get a message thanking you for your input, and you should see a post request to the back end.
-
-* You can now check the back-end to see if everything has worked ok.  From the AWS console load s3 and check out the s3 bucket,  the name of which you added when you ran the cloudFormation.  In the bucket you should see /0/\<date\>/\<guid\>.json.
-
-* In addition the cloudFormation templates will have created a second bucket.  The name will be in the format \<stack name\>-listencapturelambda-\<some text\>-listendatastore-\<sometext\>.  If you go into that bucket you should see some folders.  In each folder you should see some data for each question.
+- You can now check the back-end to see if everything has worked ok. From the AWS console load s3 and check out the s3 buckets created earlier
+  - `answers-tech-test-the-circle` - which will contain the answers (1 file per entry), and;
+  - `datastorage-dev` - which will contain the formatted/aggregated data JSON files
