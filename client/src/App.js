@@ -1,14 +1,14 @@
-import React from 'react';
-import RenderContextProvider from './contexts/RenderContext';
-import Quiz from './components/Quiz'
+import React from "react";
+import RenderContextProvider from "./contexts/RenderContext";
+import Quiz from "./components/Quiz";
 
-import './App.css';
+import "./App.css";
 
 function App() {
   return (
     <div className="App">
       <RenderContextProvider>
-        <Quiz/>
+        <Quiz />
       </RenderContextProvider>
     </div>
   );
