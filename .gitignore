@@ -16,3 +16,5 @@ awsconfiguration.json
 
 # PHP Storm
 .idea/
+.serverless
+bin/

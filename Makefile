@@ -1,20 +1,18 @@
-BUILD=main.go
+current_dir = $(shell pwd)
 
 define commonBuild
 echo "building $(TARGET_NAME)"
-cd ./server/lambda/$(FILE_NAME)/ && env GOOS=linux go build $(BUILD) && zip $(FILE_NAME).zip main && rm main
-mv ./server/lambda/$(FILE_NAME)/$(FILE_NAME).zip ./dist/
+cd ./server/lambda/$(FILE_NAME)/ && env GOOS=linux go build -o $(current_dir)/bin/$(FILE_NAME)
 endef
 
-build: ## build all of the source files and copy them to the ./dist directory
-build: preBuild listenCaptureLambda listenDataStoreLambda listenQuestionTrigger
+build: ## build all of the source files and copy them to the ./bin directory
+build: listenCaptureLambda listenDataStoreLambda listenQuestionTrigger
+
+clean:
+	rm -rf ./bin
 
 run: ## runs app on localhost:3000/
 	cd ./client && npm run start
-
-preBuild: 
-	rm -rf dist
-	mkdir dist
 
 # sets variables for listenCaptureLambda
 listenCaptureLambda: TARGET_NAME=listenCaptureLambda
@@ -23,7 +21,6 @@ listenCaptureLambda:
 	$(commonBuild)
 
 # sets variables for listenDataStore
-listenDataStoreLambda: BUILD=-o main
 listenDataStoreLambda: TARGET_NAME=listenDataStoreLambda
 listenDataStoreLambda: FILE_NAME=listenDataStore
 listenDataStoreLambda:
@@ -34,6 +31,9 @@ listenQuestionTrigger: TARGET_NAME=listenQuestionTrigger
 listenQuestionTrigger: FILE_NAME=listenQuestionTrigger
 listenQuestionTrigger:
 	$(commonBuild)
+
+deploy: build
+	sls deploy --verbose
 
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
