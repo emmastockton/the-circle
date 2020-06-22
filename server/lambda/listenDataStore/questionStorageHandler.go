@@ -115,8 +115,6 @@ func (data QuestionStorageHandler) createNewQuestionDataFile(answers QuestionAns
 	questionData.QuizID = data.QuizObject.QuizID
 	questionData.QuestionID = answers.QuestionID
 
-	questionData.AnswerData = make([]AnswerData, len(answers.Answers))
-
 	for _, answer := range answers.Answers {
 		answerData := new(AnswerData)
 		answerData.AnswerID = answer
