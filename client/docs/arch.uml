@@ -1,0 +1,40 @@
+@startuml
+skinparam componentStyle uml2
+skinparam ArrowColor #000000
+
+skinparam cloud {
+  BorderColor #cccccc
+}
+
+
+cloud AWS {
+
+  () "API Gateway" as ApiGw
+
+  package S3 {
+    database "Answers Bucket" as AnswersBucket
+    database "Datastore Bucket" as DatastoreBucket
+  }
+
+  package SQS {
+    node "Answers.fifo"
+  }
+
+  package Lambda {
+    (λ listenCapture) as listenCapture
+    (λ listenQuestionTrigger) as listenQuestionTrigger
+    (λ listenDataStore) as listenDataStore
+  }
+
+}
+
+[React Client] - ApiGw
+ApiGw - listenCapture
+
+listenCapture --> AnswersBucket :save
+AnswersBucket .[#CC0000].> listenQuestionTrigger :trigger
+listenQuestionTrigger --> Answers.fifo :push
+Answers.fifo .[#CC0000].> listenDataStore :trigger
+listenDataStore --> DatastoreBucket :save
+
+@enduml
