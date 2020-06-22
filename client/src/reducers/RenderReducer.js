@@ -1,11 +1,16 @@
-import { setRender } from "../sharedCode";
+export const getNextQuestionId = (state, { answer }) => {
+  const { answerMap, questionMap, currentQuestionId } = state;
+  const currentQuestion = questionMap.get(currentQuestionId);
 
-export const renderReducer = (state, action) => {
-  switch (action.type) {
+  return currentQuestion.nextQuestionId || answerMap.get(answer).nextQuestionId;
+};
+
+export const renderReducer = (state, { answer, type, isLoading }) => {
+  switch (type) {
     case "AsyncLoading":
       return {
         ...state,
-        isLoading: action.isLoading,
+        isLoading,
       };
     case "Error":
       return {
@@ -24,20 +29,16 @@ export const renderReducer = (state, action) => {
       };
     }
     case "AnswerQuestion": {
-      state.answers.set(state.currentQuestionId, action.update.answer);
-      const currentQuestion = state.questionMap.get(state.currentQuestionId);
+      const { answers, currentQuestionId } = state;
+      const nextQuestionId = getNextQuestionId(state, { answer });
 
-      // Move to the next question
-      state.currentQuestionId = currentQuestion.nextQuestionId
-        ? currentQuestion.nextQuestionId
-        : state.answerMap.get(action.update.answer).nextQuestionId;
+      answers.set(currentQuestionId, answer);
 
-      // call re-render
-      const nextQuestion = state.questionMap.get(state.currentQuestionId);
-      const nextRender = setRender(nextQuestion);
-      action.update.nextPage(nextRender);
-
-      return state;
+      return {
+        ...state,
+        currentQuestionId: nextQuestionId,
+        answers,
+      };
     }
     default:
       return state;

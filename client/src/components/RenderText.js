@@ -1,10 +1,6 @@
-import React, { useContext } from "react";
-import { RenderContext } from "../contexts/RenderContext";
+import React from "react";
 
-const RenderText = () => {
-  const { renderState } = useContext(RenderContext);
-  const question = renderState.questionMap.get(renderState.currentQuestionId);
-
+const RenderText = ({ question }) => {
   return (
     <div>
       <b>{question.title}</b>

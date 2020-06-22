@@ -1,7 +1,7 @@
 import React, { createContext, useReducer, useEffect } from "react";
 
 import { RenderData } from "../API/RenderData";
-import { renderReducer } from "../reducers/RenderReducer";
+import { getNextQuestionId, renderReducer } from "../reducers/RenderReducer";
 import { storeData } from "../API/StoreData";
 
 export const RenderContext = createContext();
@@ -24,56 +24,32 @@ const createQuestionMap = (questions) => {
   );
 };
 
-const createResponse = (state) => {
-  return {
-    quizId: "" + state.quizId,
-    questionAnswers: createAnswerObject(state.answers),
-  };
-};
-
-const createAnswerObject = (answerMap) => {
-  const results = [];
-
-  answerMap.forEach((value, key) => {
-    const question = {};
-    question.id = "" + key;
-    question.answers = Array.isArray(value) ? value : ["" + value];
-    results.push(question);
-  });
-
-  return results;
-};
-
 function dispatchMiddleware(dispatch, state) {
   return (action) => {
+    const nextQuestionId = getNextQuestionId(state, action);
+    const nextQuestion = state.questionMap.get(nextQuestionId);
+
     switch (action.type) {
       case "AnswerQuestion": {
-        // TODO redo all this
-        const nextQuestionId =
-          state.questionMap.get(state.currentQuestionId).nextQuestionId ||
-          state.answerMap.get(action.update.answer).nextQuestionId;
-        const nextQuestion = state.questionMap.get(nextQuestionId);
-
-        if (nextQuestion.type === "text" && !state.completed) {
-          dispatch({ type: "AsyncLoading", isLoading: true });
-          dispatch({ type: "ClearError" });
-
-          const answers = createResponse(state);
-
-          storeData(answers)
-            .then(() => {
-              dispatch(action);
-              dispatch({ type: "FinishQuiz" });
-            })
-            .catch(() => {
-              dispatch({ type: "Error" });
-            })
-            .finally(() => {
-              dispatch({ type: "AsyncLoading", isLoading: false });
-            });
-        } else {
+        if (nextQuestion.type !== "text" || state.completed) {
           dispatch(action);
+          break;
         }
+
+        dispatch({ type: "AsyncLoading", isLoading: true });
+        dispatch({ type: "ClearError" });
+
+        storeData(state)
+          .then(() => {
+            dispatch(action);
+            dispatch({ type: "FinishQuiz" });
+          })
+          .catch(() => {
+            dispatch({ type: "Error" });
+          })
+          .finally(() => {
+            dispatch({ type: "AsyncLoading", isLoading: false });
+          });
         break;
       }
       default:
@@ -88,8 +64,6 @@ const RenderContextProvider = (props) => {
   }, []);
 
   const questionData = createQuestionMap(RenderData.questions);
-
-  console.log(questionData);
 
   const [renderState, dispatch] = useReducer(renderReducer, {
     currentQuestionId: 0,
