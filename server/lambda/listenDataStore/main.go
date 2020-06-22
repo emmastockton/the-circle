@@ -54,7 +54,6 @@ func handler(ctx context.Context, event events.SQSEvent) {
 
 // Process a record from an SQS event.  The record will contain a bucket and key of a raw feedback file.
 func processRecords(record events.SQSMessage) {
-	fmt.Println("Processing record")
 	body := record.Body
 	message := parseSQSMessage(body)
 
@@ -88,7 +87,6 @@ func parseSQSMessage(input string) Message {
 }
 
 func loadData(bucketName string, key string) []byte {
-	fmt.Println("Loading data")
 	svc := s3.New(session.New())
 
 	input := &s3.GetObjectInput{
@@ -110,7 +108,6 @@ func loadData(bucketName string, key string) []byte {
 }
 
 func storeS3(data string, filename string) {
-	fmt.Println("Storing to S3")
 	bucket := os.Getenv("DataStorage")
 
 	sess, err := session.NewSession()
