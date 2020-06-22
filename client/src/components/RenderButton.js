@@ -17,6 +17,7 @@ const RenderButton = (props) => {
     return (
       <div key={answer.id}>
         <Button
+          disabled={renderState.isLoading}
           key={answer.id}
           color="primary"
           onClick={() => {

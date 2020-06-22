@@ -1,17 +1,27 @@
 import { setRender } from "../sharedCode";
-import { storeData } from "../API/StoreData";
 
 export const renderReducer = (state, action) => {
   switch (action.type) {
-    case "StoreQuiz": {
-      console.log("StoreQuiz");
-      state.completed = action.update.completed;
-      const answers = createResponse(state);
-      console.log(answers);
-
-      storeData(answers);
-
-      return state;
+    case "AsyncLoading":
+      return {
+        ...state,
+        isLoading: action.isLoading,
+      };
+    case "Error":
+      return {
+        ...state,
+        error: true,
+      };
+    case "ClearError":
+      return {
+        ...state,
+        error: false,
+      };
+    case "FinishQuiz": {
+      return {
+        ...state,
+        completed: true,
+      };
     }
     case "AnswerQuestion": {
       state.answers.set(state.currentQuestionId, action.update.answer);
@@ -32,24 +42,4 @@ export const renderReducer = (state, action) => {
     default:
       return state;
   }
-};
-
-const createResponse = (state) => {
-  return {
-    quizId: "" + state.quizId,
-    questionAnswers: createAnswerObject(state.answers),
-  };
-};
-
-const createAnswerObject = (answerMap) => {
-  const results = [];
-
-  answerMap.forEach((value, key) => {
-    const question = {};
-    question.id = "" + key;
-    question.answers = Array.isArray(value) ? value : ["" + value];
-    results.push(question);
-  });
-
-  return results;
 };

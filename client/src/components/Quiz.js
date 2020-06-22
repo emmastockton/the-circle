@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
-import { RenderContext } from "../contexts/RenderContext";
+import { Spinner, UncontrolledAlert } from "reactstrap";
 
+import { RenderContext } from "../contexts/RenderContext";
 import RenderButton from "./RenderButton";
 import RenderMultiSelect from "./RenderMultiSelect";
 import RenderText from "./RenderText";
@@ -16,6 +17,12 @@ function Quiz() {
 
   return (
     <div>
+      {renderState.isLoading && <Spinner color="primary" />}
+      {renderState.error && (
+        <UncontrolledAlert color="danger">
+          Uh oh, that didn't work. Try again later.
+        </UncontrolledAlert>
+      )}
       {state.renderButton && <RenderButton nextPage={setState} />}
       {state.renderMultiSelect && <RenderMultiSelect nextPage={setState} />}
       {state.renderText && <RenderText />}

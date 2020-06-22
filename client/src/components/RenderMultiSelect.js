@@ -64,7 +64,9 @@ const RenderMultiSelect = (props) => {
       </div>
 
       <div>
-        <button onClick={() => handleClick()}>Continue</button>
+        <button disabled={renderState.isLoading} onClick={() => handleClick()}>
+          Continue
+        </button>
       </div>
 
       {state.viewAlert && renderAlert()}

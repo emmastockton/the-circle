@@ -115,6 +115,9 @@ func (data QuestionStorageHandler) createNewQuestionDataFile(answers QuestionAns
 	questionData.QuizID = data.QuizObject.QuizID
 	questionData.QuestionID = answers.QuestionID
 
+	year, month, _ := time.Now().Date()
+	fmt.Printf("%d-%d", int(month), year)
+
 	questionData.AnswerData = make([]AnswerData, len(answers.Answers))
 
 	for _, answer := range answers.Answers {
