@@ -1,3 +1,5 @@
+import { apiEndpoint } from "../config";
+
 const createResponse = (state) => {
   return {
     quizId: "" + state.quizId,
@@ -20,10 +22,11 @@ const createAnswerObject = (answerMap) => {
 
 export const storeData = (state) => {
   const quizData = createResponse(state);
-  const apiEndpoint = window.awsAPI.apiEndpoint + "?quizId=" + quizData.quizId;
-  return fetch(apiEndpoint, {
+  const apiUrl = `${apiEndpoint}?quizId=${quizData.quizId}`;
+
+  return fetch(apiUrl, {
     method: "POST",
-    body: JSON.stringify(quizData),
+    body: JSON.stringify({ quizData }),
   }).then((res) => {
     if (!res.ok) {
       throw new Error();
