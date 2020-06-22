@@ -7,7 +7,7 @@
  *
  * Each question has a type, text, optional next question and one or more answers that themselves can lead on to another question.
  */
-exports.RenderData = {
+export const RenderData = {
   id: 0,
   title: "Daily Engagement Service",
   questions: [
