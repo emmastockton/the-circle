@@ -1,7 +1,8 @@
 import React, { createContext, useReducer, useEffect } from "react";
 
 import { RenderData } from "../API/RenderData";
-import { renderReducer } from "../reducers/RenderReducer";
+import { getNextQuestionId, renderReducer } from "../reducers/RenderReducer";
+import { storeData } from "../API/StoreData";
 
 export const RenderContext = createContext();
 
@@ -23,14 +24,48 @@ const createQuestionMap = (questions) => {
   );
 };
 
+function dispatchMiddleware(dispatch, state) {
+  return (action) => {
+    const nextQuestionId = getNextQuestionId(state, action);
+    const nextQuestion = state.questionMap.get(nextQuestionId);
+
+    console.log(nextQuestion);
+
+    switch (action.type) {
+      case "AnswerQuestion": {
+        if (nextQuestion.quizEnds !== true || state.completed) {
+          dispatch(action);
+          break;
+        }
+
+        dispatch({ type: "AsyncLoading", isLoading: true });
+        dispatch({ type: "ClearError" });
+
+        storeData(state)
+          .then(() => {
+            dispatch(action);
+            dispatch({ type: "FinishQuiz" });
+          })
+          .catch(() => {
+            dispatch({ type: "Error" });
+          })
+          .finally(() => {
+            dispatch({ type: "AsyncLoading", isLoading: false });
+          });
+        break;
+      }
+      default:
+        return dispatch(action);
+    }
+  };
+}
+
 const RenderContextProvider = (props) => {
   useEffect(() => {
     console.log("We will call out to do a quiz ICL here");
   }, []);
 
   const questionData = createQuestionMap(RenderData.questions);
-
-  console.log(questionData);
 
   const [renderState, dispatch] = useReducer(renderReducer, {
     currentQuestionId: 0,
@@ -41,10 +76,17 @@ const RenderContextProvider = (props) => {
     renderDropDown: true,
     completed: false,
     quizId: RenderData.id,
+    error: false,
+    isLoading: false,
   });
 
   return (
-    <RenderContext.Provider value={{ renderState, dispatch }}>
+    <RenderContext.Provider
+      value={{
+        renderState,
+        dispatch: dispatchMiddleware(dispatch, renderState),
+      }}
+    >
       {props.children}
     </RenderContext.Provider>
   );

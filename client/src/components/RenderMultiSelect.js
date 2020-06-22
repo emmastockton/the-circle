@@ -1,12 +1,8 @@
-import { Input, Alert } from "reactstrap";
-import React, { useState, useContext } from "react";
-import { RenderContext } from "../contexts/RenderContext";
+import { Button, Input, Alert } from "reactstrap";
+import React, { useState } from "react";
 
-const RenderMultiSelect = (props) => {
+const RenderMultiSelect = ({ question, isLoading, onAnswer }) => {
   const [state, setState] = useState({ selected: [] });
-
-  const { renderState, dispatch } = useContext(RenderContext);
-  const question = renderState.questionMap.get(renderState.currentQuestionId);
 
   const renderOption = (answer) => {
     return (
@@ -35,10 +31,7 @@ const RenderMultiSelect = (props) => {
 
   const handleClick = () => {
     if (state.selected.length > 0) {
-      dispatch({
-        type: "AnswerQuestion",
-        update: { answer: state.selected, nextPage: props.nextPage },
-      });
+      onAnswer(state.selected);
     } else {
       setState({ ...state, viewAlert: true });
     }
@@ -64,7 +57,14 @@ const RenderMultiSelect = (props) => {
       </div>
 
       <div>
-        <button onClick={() => handleClick()}>Continue</button>
+        <Button
+          block
+          color="primary"
+          disabled={isLoading}
+          onClick={() => handleClick()}
+        >
+          Continue
+        </Button>
       </div>
 
       {state.viewAlert && renderAlert()}

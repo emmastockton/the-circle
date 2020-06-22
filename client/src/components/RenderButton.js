@@ -1,31 +1,24 @@
-import { Button } from "reactstrap";
-import React, { useContext } from "react";
-import { RenderContext } from "../contexts/RenderContext";
+import { Button, Row, Col } from "reactstrap";
+import React from "react";
 
-const RenderButton = (props) => {
-  const { renderState, dispatch } = useContext(RenderContext);
-  const question = renderState.questionMap.get(renderState.currentQuestionId);
-
-  const handleClick = (id) => {
-    dispatch({
-      type: "AnswerQuestion",
-      update: { answer: id, nextPage: props.nextPage },
-    });
-  };
-
-  const button = (answer) => {
+const RenderButton = ({ question, isLoading, onAnswer }) => {
+  const AnswerButton = ({ answer }) => {
     return (
-      <div key={answer.id}>
-        <Button
-          key={answer.id}
-          color="primary"
-          onClick={() => {
-            handleClick(answer.id);
-          }}
-        >
-          {answer.text}
-        </Button>
-      </div>
+      <Row key={answer.id} xs="12" style={{ margin: "10px 0" }}>
+        <Col>
+          <Button
+            disabled={isLoading}
+            key={answer.id}
+            color="primary"
+            block
+            onClick={() => {
+              onAnswer(answer.id);
+            }}
+          >
+            {answer.text}
+          </Button>
+        </Col>
+      </Row>
     );
   };
 
@@ -35,11 +28,10 @@ const RenderButton = (props) => {
         <div>
           <b>{question.title}</b>
         </div>
-        <span>
-          {question.answers.map((answer) => {
-            return button(answer);
-          })}
-        </span>
+
+        {question.answers.map((answer) => {
+          return <AnswerButton key={`answer-${answer.id}`} answer={answer} />;
+        })}
       </div>
     </div>
   );
