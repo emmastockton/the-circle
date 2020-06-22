@@ -1,3 +1,7 @@
+> **NOTE** see [docs/README.md](./docs/README.md) for a summary of changes made as part of this tech task summary.
+
+---
+
 # theCircle - A tool to help us listen to our employees
 
 theCircle is a POC project where we are experimenting with tools and techniques to gather and then analyse feedback from our teams.
