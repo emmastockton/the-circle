@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Spinner, UncontrolledAlert } from "reactstrap";
+import { Container, Spinner, UncontrolledAlert } from "reactstrap";
 
 import { RenderContext } from "../contexts/RenderContext";
 import RenderButton from "./RenderButton";
@@ -8,32 +8,43 @@ import RenderText from "./RenderText";
 
 import "../App.css";
 
+const QuestionTypes = {
+  button: RenderButton,
+  multiSelect: RenderMultiSelect,
+  text: RenderText,
+};
+
 export default function Quiz() {
   const { renderState, dispatch } = useContext(RenderContext);
   const question = renderState.questionMap.get(renderState.currentQuestionId);
   const { isLoading } = renderState;
 
-  const onAnswer = (answer) => {
-    dispatch({ type: "AnswerQuestion", answer });
-  };
-
   const props = {
     isLoading,
     question,
-    onAnswer,
+    onAnswer: (answer) => dispatch({ type: "AnswerQuestion", answer }),
   };
 
+  const QuestionTypeComponent = QuestionTypes[question.type];
+
+  if (!QuestionTypeComponent) {
+    throw new Error(
+      `Unexpected question type of ${
+        question.type
+      }. Vaild types are: ${Object.keys(QuestionTypes).join(", ")}`
+    );
+  }
+
   return (
-    <div>
+    <Container>
       {renderState.isLoading && <Spinner color="primary" />}
       {renderState.error && (
         <UncontrolledAlert color="danger">
           Uh oh, that didn't work. Try again later.
         </UncontrolledAlert>
       )}
-      {question.type === "button" && <RenderButton {...props} />}
-      {question.type === "multiSelect" && <RenderMultiSelect {...props} />}
-      {question.type === "text" && <RenderText {...props} />}
-    </div>
+
+      <QuestionTypeComponent {...props} />
+    </Container>
   );
 }

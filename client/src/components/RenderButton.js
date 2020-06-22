@@ -1,21 +1,24 @@
-import { Button } from "reactstrap";
+import { Button, Row, Col } from "reactstrap";
 import React from "react";
 
 const RenderButton = ({ question, isLoading, onAnswer }) => {
   const AnswerButton = ({ answer }) => {
     return (
-      <div key={answer.id}>
-        <Button
-          disabled={isLoading}
-          key={answer.id}
-          color="primary"
-          onClick={() => {
-            onAnswer(answer.id);
-          }}
-        >
-          {answer.text}
-        </Button>
-      </div>
+      <Row key={answer.id} xs="12" style={{ margin: "10px 0" }}>
+        <Col>
+          <Button
+            disabled={isLoading}
+            key={answer.id}
+            color="primary"
+            block
+            onClick={() => {
+              onAnswer(answer.id);
+            }}
+          >
+            {answer.text}
+          </Button>
+        </Col>
+      </Row>
     );
   };
 
@@ -25,11 +28,10 @@ const RenderButton = ({ question, isLoading, onAnswer }) => {
         <div>
           <b>{question.title}</b>
         </div>
-        <span>
-          {question.answers.map((answer) => {
-            return <AnswerButton answer={answer} />;
-          })}
-        </span>
+
+        {question.answers.map((answer) => {
+          return <AnswerButton key={`answer-${answer.id}`} answer={answer} />;
+        })}
       </div>
     </div>
   );

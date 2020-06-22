@@ -29,9 +29,11 @@ function dispatchMiddleware(dispatch, state) {
     const nextQuestionId = getNextQuestionId(state, action);
     const nextQuestion = state.questionMap.get(nextQuestionId);
 
+    console.log(nextQuestion);
+
     switch (action.type) {
       case "AnswerQuestion": {
-        if (nextQuestion.type !== "text" || state.completed) {
+        if (nextQuestion.quizEnds !== true || state.completed) {
           dispatch(action);
           break;
         }

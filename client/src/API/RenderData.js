@@ -113,11 +113,13 @@ exports.RenderData = {
       id: 4,
       title: "Thanks for your input.",
       type: "text",
+      quizEnds: true,
     },
     {
       id: 5,
       title: "Thanks for your input.  Help is on its way!",
       type: "text",
+      quizEnds: true,
     },
   ],
 };

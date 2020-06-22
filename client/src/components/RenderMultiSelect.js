@@ -1,4 +1,4 @@
-import { Input, Alert } from "reactstrap";
+import { Button, Input, Alert } from "reactstrap";
 import React, { useState } from "react";
 
 const RenderMultiSelect = ({ question, isLoading, onAnswer }) => {
@@ -57,9 +57,14 @@ const RenderMultiSelect = ({ question, isLoading, onAnswer }) => {
       </div>
 
       <div>
-        <button disabled={isLoading} onClick={() => handleClick()}>
+        <Button
+          block
+          color="primary"
+          disabled={isLoading}
+          onClick={() => handleClick()}
+        >
           Continue
-        </button>
+        </Button>
       </div>
 
       {state.viewAlert && renderAlert()}
