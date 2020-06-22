@@ -1,4 +1,4 @@
-> **NOTE** see [docs/README.md](docs/README.md) for a summary of changes made as part of this tech task summary.
+> **NOTE** see [docs/README.md](./docs/README.md) for a summary of changes made as part of this tech task summary.
 
 ---
 
